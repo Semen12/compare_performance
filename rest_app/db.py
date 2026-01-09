@@ -2,45 +2,69 @@ import json
 from pathlib import Path
 from typing import Dict
 
-# 1. Настройка путей (оставляем как было, это правильно)
-CURRENT_DIR = Path(__file__).resolve().parent
-PROJECT_ROOT = CURRENT_DIR.parent 
-DB_FILE = PROJECT_ROOT / "glossary.json"
+        # --- НОВЫЙ КОД (IN-MEMORY) ---
+# Используем глобальную переменную как хранилище
+# Это обеспечивает максимальную скорость и честное сравнение с gRPC сервером,
+# который также хранит данные в памяти.
+
+FAKE_DB = {
+     "API": "Application Programming Interface. Интерфейс...",
+     "HTTP": "HyperText Transfer Protocol..."
+}
 
 def get_db() -> Dict[str, str]:
+    """Возвращает ссылку на словарь в памяти."""
+    return FAKE_DB
+
+def save_db(db: Dict[str, str]):
     """
-    Загружает данные и преобразует список словарей в один словарь.
-    JSON: [{"term": "A", "definition": "B"}, ...] 
-    Python: {"A": "B", ...}
+    В случае in-memory нам не нужно ничего 'сохранять' физически,
+    так как мы работаем с одним и тем же объектом словаря по ссылке.
+    Но оставим функцию для совместимости с интерфейсом main.py.
     """
-    print(f"Попытка открыть файл: {DB_FILE}")
+    global FAKE_DB
+    FAKE_DB = db
+
+# # 1. Настройка путей (оставляем как было, это правильно)
+# CURRENT_DIR = Path(__file__).resolve().parent
+# PROJECT_ROOT = CURRENT_DIR.parent 
+# DB_FILE = PROJECT_ROOT / "glossary.json"
+
+# def get_db() -> Dict[str, str]:
+#     """
+#     Загружает данные и преобразует список словарей в один словарь.
+#     JSON: [{"term": "A", "definition": "B"}, ...] 
+#     Python: {"A": "B", ...}
+#     """
+#     print(f"Попытка открыть файл: {DB_FILE}")
     
-    if not DB_FILE.exists():
-        return {}
+#     if not DB_FILE.exists():
+#         return {}
 
-    with open(DB_FILE, "r", encoding="utf-8") as f:
-        content = f.read()
-        if not content:
-            return {}
+#     with open(DB_FILE, "r", encoding="utf-8") as f:
+#         content = f.read()
+#         if not content:
+#             return {}
         
-        # 1. Загружаем "сырой" список из JSON
-        raw_list = json.loads(content)
+#         # 1. Загружаем "сырой" список из JSON
+#         raw_list = json.loads(content)
         
-        # 2. Превращаем список в словарь для удобного поиска O(1) и редактирования
-        # Было: list[dict], Стало: dict[str, str]
-        return {item["term"]: item["definition"] for item in raw_list}
+#         # 2. Превращаем список в словарь для удобного поиска O(1) и редактирования
+#         # Было: list[dict], Стало: dict[str, str]
+#         return {item["term"]: item["definition"] for item in raw_list}
 
-def save_db(database: Dict[str, str]) -> None:
-    """
-    Преобразует словарь обратно в список и сохраняет в JSON.
-    """
-    # 1. Превращаем словарь обратно в формат, ожидаемый JSON-файлом
-    # Было: {"A": "B"}, Стало: [{"term": "A", "definition": "B"}]
-    list_to_save = [
-        {"term": term, "definition": definition} 
-        for term, definition in database.items()
-    ]
+# def save_db(database: Dict[str, str]) -> None:
+#     """
+#     Преобразует словарь обратно в список и сохраняет в JSON.
+#     """
+#     # 1. Превращаем словарь обратно в формат, ожидаемый JSON-файлом
+#     # Было: {"A": "B"}, Стало: [{"term": "A", "definition": "B"}]
+#     list_to_save = [
+#         {"term": term, "definition": definition} 
+#         for term, definition in database.items()
+#     ]
 
-    # 2. Сохраняем
-    with open(DB_FILE, "w", encoding="utf-8") as f:
-        json.dump(list_to_save, f, ensure_ascii=False, indent=4)
+#     # 2. Сохраняем
+#     with open(DB_FILE, "w", encoding="utf-8") as f:
+#         json.dump(list_to_save, f, ensure_ascii=False, indent=4)
+
