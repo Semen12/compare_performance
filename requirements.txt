@@ -1,0 +1,8 @@
+locust
+fastapi
+requests
+grpcio 
+grpcio-tools
+fastapi
+uvicorn[standard]
+protoletariat

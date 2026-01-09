@@ -1,0 +1,70 @@
+syntax = "proto3";
+
+package dictionary;
+
+// Сервис, предоставляющий функциональность словаря с полным набором CRUD-операций
+service Dictionary {
+  // C: Create - Добавление нового термина
+  rpc AddTerm(AddTermRequest) returns (AddTermResponse);
+
+  // R: Read - Получение информации о конкретном термине
+  rpc GetTerm(GetTermRequest) returns (Term);
+
+  // R: Read - Получение списка всех терминов
+  rpc GetAllTerms(GetAllTermsRequest) returns (GetAllTermsResponse);
+
+  // U: Update - Обновление существующего термина
+  rpc UpdateTerm(UpdateTermRequest) returns (UpdateTermResponse);
+
+  // D: Delete - Удаление термина
+  rpc DeleteTerm(DeleteTermRequest) returns (DeleteTermResponse);
+}
+
+// --- Основные структуры данных ---
+message Term {
+  string term = 1;
+  string definition = 2;
+}
+
+// --- Сообщения для конкретных методов ---
+
+// AddTerm
+message AddTermRequest {
+  Term term_to_add = 1;
+}
+message AddTermResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+// GetTerm
+message GetTermRequest {
+  string term = 1;
+}
+// В качестве ответа для GetTerm используется само сообщение Term.
+// Ошибки (например, "термин не найден") обрабатываются через статусы gRPC.
+
+// GetAllTerms
+message GetAllTermsRequest {} // Пустое сообщение для запроса всех терминов
+message GetAllTermsResponse {
+  repeated Term terms = 1; // Список всех терминов
+}
+
+// UpdateTerm
+message UpdateTermRequest {
+  string original_term = 1; // Ключ для поиска термина, который нужно обновить
+  Term new_term_data = 2;   // Новые данные для термина
+}
+message UpdateTermResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+// DeleteTerm
+message DeleteTermRequest {
+  string term = 1;
+}
+message DeleteTermResponse {
+  bool success = 1;
+  string message = 2;
+}
