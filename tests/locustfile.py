@@ -1,4 +1,4 @@
-import os
+import uuid
 import sys
 from pathlib import Path
 import time
@@ -67,7 +67,15 @@ class RestUser(HttpUser):
 
     @task(1) # Вес 1: создание термина
     def create_term(self):
-        term_id = f"Term_{random.randint(1, 100000)}"
+        # term_id = f"Term_{random.randint(1, 100000)}"
+        # self.client.post(
+        #     "/terms", 
+        #     json={"term": term_id, "definition": "Test definition"},
+        #     name="/terms (POST)"
+        # )
+
+        term_id = f"Term_{uuid.uuid4()}" 
+        
         self.client.post(
             "/terms", 
             json={"term": term_id, "definition": "Test definition"},
@@ -98,7 +106,8 @@ class GrpcUser(User):
 
     @task(1)
     def add_term(self):
-        term_id = f"Term_{random.randint(1, 100000)}"
+        # term_id = f"Term_{random.randint(1, 100000)}"
+        term_id = f"Term_{uuid.uuid4()}"
         term_obj = dictionary_pb2.Term(term=term_id, definition="Test definition")
         req = dictionary_pb2.AddTermRequest(term_to_add=term_obj)
         
